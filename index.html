@@ -18,11 +18,16 @@
         }
 
         .book-container {
+            /* --- MUDANÇA PRINCIPAL: Tamanho relativo --- */
+            /* Ocupa 80% da largura da tela, mas no máximo 500px */
+            width: 80vw;
+            max-width: 500px;
+            /* Altura é 1.2 vezes a largura, mantendo a proporção */
+            aspect-ratio: 1 / 1.2;
+            
+            position: relative;
             transform-style: preserve-3d;
             transition: transform 1.5s ease-in-out;
-            /* Tamanho padrão para desktop */
-            width: 512px; /* 256px * 2 */
-            height: 600px;
         }
 
         .book-container.open {
@@ -54,7 +59,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            padding: 1rem; /* Padding menor para telas pequenas */
             box-sizing: border-box;
         }
         
@@ -70,37 +75,25 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-
-        /* --- CÓDIGO RESPONSIVO PARA CELULAR --- */
-        @media (max-width: 640px) {
-            .book-container {
-                /* Diminui a escala do livro para caber na tela */
-                transform: scale(0.75);
-                /* Ajusta a animação de abertura para a nova escala */
-            }
-            .book-container.open {
-                transform: translateX(50%) scale(0.75);
-            }
-        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 bg-stone-200">
-    <div class="w-full max-w-4xl flex justify-center">
-        <div id="bookContainer" class="book-container relative mx-auto">
+    <div class="w-full max-w-4xl flex justify-center items-center">
+        <div id="bookContainer" class="book-container mx-auto">
             <div class="book-cover flex flex-col justify-center items-center text-center p-4 rounded-r-lg shadow-2xl bg-stone-800">
-                <h1 class="title text-4xl md:text-5xl font-bold text-amber-200 mb-8 text-center px-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Feira do Livro Sertãozinho</h1>
-                <button id="openBookBtn" class="bg-amber-50 text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-amber-100 transition duration-300 shadow-lg">
+                <h1 class="title text-4xl lg:text-5xl font-bold text-amber-200 mb-6 lg:mb-8 text-center px-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Feira do Livro Sertãozinho</h1>
+                <button id="openBookBtn" class="bg-amber-50 text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-amber-100 transition duration-300 shadow-lg text-sm lg:text-base">
                     Abrir Livro
                 </button>
             </div>
 
             <div class="book-page rounded-r-lg bg-amber-50">
-                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-stone-800">Selecione sua série:</h2>
-                <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
-                    <button class="btn-class bg-sky-700 hover:bg-sky-800 text-white py-3 rounded-lg font-medium" data-grade="6">6º Ano</button>
-                    <button class="btn-class bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-lg font-medium" data-grade="7">7º Ano</button>
-                    <button class="btn-class bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-medium" data-grade="8">8º Ano</button>
-                    <button class="btn-class bg-red-800 hover:bg-red-900 text-white py-3 rounded-lg font-medium" data-grade="9">9º Ano</button>
+                <h2 class="text-2xl lg:text-3xl font-bold mb-6 lg:mb-8 text-stone-800 text-center">Selecione sua série:</h2>
+                <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
+                    <button class="btn-class bg-sky-700 hover:bg-sky-800 text-white py-3 rounded-lg font-medium text-sm lg:text-base" data-grade="6">6º Ano</button>
+                    <button class="btn-class bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-lg font-medium text-sm lg:text-base" data-grade="7">7º Ano</button>
+                    <button class="btn-class bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-medium text-sm lg:text-base" data-grade="8">8º Ano</button>
+                    <button class="btn-class bg-red-800 hover:bg-red-900 text-white py-3 rounded-lg font-medium text-sm lg:text-base" data-grade="9">9º Ano</button>
                 </div>
             </div>
         </div>
@@ -130,7 +123,7 @@
     </div>
 
     <script>
-        // --- ELEMENTOS DOM ---
+        // --- O JAVASCRIPT CONTINUA EXATAMENTE O MESMO ---
         const bookContainer = document.getElementById('bookContainer');
         const openBookBtn = document.getElementById('openBookBtn');
         const classSelection = document.getElementById('classSelection');
@@ -141,18 +134,12 @@
         const trabalhosTitulo = document.getElementById('trabalhosTitulo');
         const trabalhosLista = document.getElementById('trabalhosLista');
         const voltarParaSelecao = document.getElementById('voltarParaSelecao');
-
-        // Variáveis globais
         let selectedGrade = null;
         let selectedClass = null;
-
-        // --- ABRIR O LIVRO ---
         openBookBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             bookContainer.classList.add('open');
         });
-
-        // --- SELEÇÃO DE SÉRIE ---
         gradeButtons.forEach(button => {
             button.addEventListener('click', () => {
                 selectedGrade = button.getAttribute('data-grade');
@@ -160,8 +147,6 @@
                 classSelection.classList.remove('hidden');
             });
         });
-
-        // --- LÓGICA PRINCIPAL: SELEÇÃO DE TURMA E BUSCA DOS TRABALHOS ---
         classButtons.forEach(button => {
             button.addEventListener('click', async () => {
                 selectedClass = button.getAttribute('data-class');
@@ -171,7 +156,6 @@
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
-
                 try {
                     const AIRTABLE_API_KEY = 'patmsmqDnLsx573SF.18a0ddaddde79f158d1a3f575d388ba24cddd0cc2b9b55edd037d28daaff8f4c';
                     const AIRTABLE_BASE_ID = 'appU0CeDrefVUKuTI';
@@ -181,14 +165,11 @@
                     const config = { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } };
                     const response = await axios.get(url, config);
                     const trabalhos = response.data.records;
-
                     Swal.close();
-
                     classSelection.classList.add('hidden');
                     trabalhosContainer.classList.remove('hidden');
                     trabalhosTitulo.innerText = `Trabalhos para o ${selectedGrade}º Ano - Turma ${selectedClass}`;
                     trabalhosLista.innerHTML = ''; 
-
                     if (trabalhos.length > 0) {
                         trabalhos.forEach(record => {
                             const fields = record.fields;
@@ -211,14 +192,11 @@
                 }
             });
         });
-
-        // --- BOTÕES DE NAVEGAÇÃO "VOLTAR" ---
         backToGrade.addEventListener('click', () => {
             classSelection.classList.add('hidden');
             bookContainer.style.display = 'block';
             bookContainer.classList.remove('open');
         });
-
         voltarParaSelecao.addEventListener('click', () => {
             trabalhosContainer.classList.add('hidden');
             classSelection.classList.remove('hidden');
