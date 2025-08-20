@@ -14,16 +14,17 @@
             font-family: 'Roboto', sans-serif;
             background-color: #f5f5f5;
             overflow-x: hidden;
-            /* Adiciona perspectiva para o efeito 3D */
             perspective: 2000px;
         }
 
         .book-container {
             transform-style: preserve-3d;
             transition: transform 1.5s ease-in-out;
+            /* Tamanho padrão para desktop */
+            width: 512px; /* 256px * 2 */
+            height: 600px;
         }
 
-        /* Quando o livro abrir, ele vai girar */
         .book-container.open {
             transform: translateX(50%);
         }
@@ -36,21 +37,18 @@
             left: 0;
             transform-origin: left center;
             transition: transform 1.5s ease-in-out;
-            backface-visibility: hidden; /* Esconde a parte de trás do elemento ao virar */
+            backface-visibility: hidden;
         }
 
         .book-cover {
-            /* A cor da capa agora é definida pelas classes do Tailwind no HTML */
             z-index: 10;
         }
         
-        /* Gira a capa ao abrir */
         .book-container.open .book-cover {
             transform: rotateY(-180deg);
         }
 
         .book-page {
-            /* A cor da página agora é definida pelas classes do Tailwind no HTML */
             z-index: 5;
             display: flex;
             flex-direction: column;
@@ -72,20 +70,32 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
+
+        /* --- CÓDIGO RESPONSIVO PARA CELULAR --- */
+        @media (max-width: 640px) {
+            .book-container {
+                /* Diminui a escala do livro para caber na tela */
+                transform: scale(0.75);
+                /* Ajusta a animação de abertura para a nova escala */
+            }
+            .book-container.open {
+                transform: translateX(50%) scale(0.75);
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 bg-stone-200">
-    <div class="w-full max-w-4xl">
-        <div id="bookContainer" class="book-container relative w-full max-w-lg h-[600px] mx-auto">
+    <div class="w-full max-w-4xl flex justify-center">
+        <div id="bookContainer" class="book-container relative mx-auto">
             <div class="book-cover flex flex-col justify-center items-center text-center p-4 rounded-r-lg shadow-2xl bg-stone-800">
-                <h1 class="title text-5xl font-bold text-amber-200 mb-8 text-center px-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Feira do Livro Sertãozinho</h1>
+                <h1 class="title text-4xl md:text-5xl font-bold text-amber-200 mb-8 text-center px-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Feira do Livro Sertãozinho</h1>
                 <button id="openBookBtn" class="bg-amber-50 text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-amber-100 transition duration-300 shadow-lg">
                     Abrir Livro
                 </button>
             </div>
 
             <div class="book-page rounded-r-lg bg-amber-50">
-                <h2 class="text-3xl font-bold mb-8 text-stone-800">Selecione sua série:</h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-stone-800">Selecione sua série:</h2>
                 <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
                     <button class="btn-class bg-sky-700 hover:bg-sky-800 text-white py-3 rounded-lg font-medium" data-grade="6">6º Ano</button>
                     <button class="btn-class bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-lg font-medium" data-grade="7">7º Ano</button>
@@ -95,7 +105,7 @@
             </div>
         </div>
 
-        <div id="classSelection" class="hidden bg-white rounded-lg shadow-xl p-6 mt-8 w-full max-w-2xl mx-auto">
+        <div id="classSelection" class="hidden bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-auto">
              <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-stone-800">Selecione sua turma:</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
                 <button class="btn-class bg-blue-100 hover:bg-blue-200 text-blue-800 py-4 rounded-lg font-medium border-2 border-blue-300" data-class="A">Turma A</button>
@@ -109,7 +119,7 @@
             </button>
         </div>
 
-        <div id="trabalhosContainer" class="hidden w-full max-w-4xl mx-auto mt-8">
+        <div id="trabalhosContainer" class="hidden w-full max-w-4xl mx-auto">
             <h2 id="trabalhosTitulo" class="text-3xl font-bold mb-6 text-center text-stone-800"></h2>
             <div id="trabalhosLista" class="space-y-6"></div>
             <button id="voltarParaSelecao" class="mt-8 bg-stone-700 hover:bg-stone-800 text-white px-6 py-2 rounded-full font-semibold flex items-center justify-center mx-auto">
@@ -138,7 +148,7 @@
 
         // --- ABRIR O LIVRO ---
         openBookBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Impede que o clique se propague para outros elementos
+            e.stopPropagation();
             bookContainer.classList.add('open');
         });
 
@@ -146,7 +156,6 @@
         gradeButtons.forEach(button => {
             button.addEventListener('click', () => {
                 selectedGrade = button.getAttribute('data-grade');
-                // Esconde o livro e mostra a seleção de turma
                 bookContainer.style.display = 'none';
                 classSelection.classList.remove('hidden');
             });
@@ -207,7 +216,6 @@
         backToGrade.addEventListener('click', () => {
             classSelection.classList.add('hidden');
             bookContainer.style.display = 'block';
-            // Reseta a animação do livro para o estado inicial
             bookContainer.classList.remove('open');
         });
 
