@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feira do Livro - Sertãozinho</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+            /* Adiciona perspectiva para o efeito 3D */
+            perspective: 2000px;
+        }
+
+        .book-container {
+            transform-style: preserve-3d;
+            transition: transform 1.5s ease-in-out;
+        }
+
+        /* Quando o livro abrir, ele vai girar */
+        .book-container.open {
+            transform: translateX(50%);
+        }
+        
+        .book-cover, .book-page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: left center;
+            transition: transform 1.5s ease-in-out;
+            backface-visibility: hidden; /* Esconde a parte de trás do elemento ao virar */
+        }
+
+        .book-cover {
+            /* A cor da capa agora é definida pelas classes do Tailwind no HTML */
+            z-index: 10;
+        }
+        
+        /* Gira a capa ao abrir */
+        .book-container.open .book-cover {
+            transform: rotateY(-180deg);
+        }
+
+        .book-page {
+            /* A cor da página agora é definida pelas classes do Tailwind no HTML */
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        
+        .title {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .btn-class {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-class:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 bg-stone-200">
+    <div class="w-full max-w-4xl">
+        <div id="bookContainer" class="book-container relative w-full max-w-lg h-[600px] mx-auto">
+            <div class="book-cover flex flex-col justify-center items-center text-center p-4 rounded-r-lg shadow-2xl bg-stone-800">
+                <h1 class="title text-5xl font-bold text-amber-200 mb-8 text-center px-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Feira do Livro Sertãozinho</h1>
+                <button id="openBookBtn" class="bg-amber-50 text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-amber-100 transition duration-300 shadow-lg">
+                    Abrir Livro
+                </button>
+            </div>
+
+            <div class="book-page rounded-r-lg bg-amber-50">
+                <h2 class="text-3xl font-bold mb-8 text-stone-800">Selecione sua série:</h2>
+                <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
+                    <button class="btn-class bg-sky-700 hover:bg-sky-800 text-white py-3 rounded-lg font-medium" data-grade="6">6º Ano</button>
+                    <button class="btn-class bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-lg font-medium" data-grade="7">7º Ano</button>
+                    <button class="btn-class bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-medium" data-grade="8">8º Ano</button>
+                    <button class="btn-class bg-red-800 hover:bg-red-900 text-white py-3 rounded-lg font-medium" data-grade="9">9º Ano</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="classSelection" class="hidden bg-white rounded-lg shadow-xl p-6 mt-8 w-full max-w-2xl mx-auto">
+             <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-stone-800">Selecione sua turma:</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                <button class="btn-class bg-blue-100 hover:bg-blue-200 text-blue-800 py-4 rounded-lg font-medium border-2 border-blue-300" data-class="A">Turma A</button>
+                <button class="btn-class bg-green-100 hover:bg-green-200 text-green-800 py-4 rounded-lg font-medium border-2 border-green-300" data-class="B">Turma B</button>
+                <button class="btn-class bg-yellow-100 hover:bg-yellow-200 text-yellow-800 py-4 rounded-lg font-medium border-2 border-yellow-300" data-class="C">Turma C</button>
+                <button class="btn-class bg-red-100 hover:bg-red-200 text-red-800 py-4 rounded-lg font-medium border-2 border-red-300" data-class="D">Turma D</button>
+            </div>
+            <button id="backToGrade" class="mt-6 text-stone-600 hover:text-stone-800 font-medium flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                Voltar
+            </button>
+        </div>
+
+        <div id="trabalhosContainer" class="hidden w-full max-w-4xl mx-auto mt-8">
+            <h2 id="trabalhosTitulo" class="text-3xl font-bold mb-6 text-center text-stone-800"></h2>
+            <div id="trabalhosLista" class="space-y-6"></div>
+            <button id="voltarParaSelecao" class="mt-8 bg-stone-700 hover:bg-stone-800 text-white px-6 py-2 rounded-full font-semibold flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                Voltar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- ELEMENTOS DOM ---
+        const bookContainer = document.getElementById('bookContainer');
+        const openBookBtn = document.getElementById('openBookBtn');
+        const classSelection = document.getElementById('classSelection');
+        const backToGrade = document.getElementById('backToGrade');
+        const gradeButtons = document.querySelectorAll('[data-grade]');
+        const classButtons = document.querySelectorAll('[data-class]');
+        const trabalhosContainer = document.getElementById('trabalhosContainer');
+        const trabalhosTitulo = document.getElementById('trabalhosTitulo');
+        const trabalhosLista = document.getElementById('trabalhosLista');
+        const voltarParaSelecao = document.getElementById('voltarParaSelecao');
+
+        // Variáveis globais
+        let selectedGrade = null;
+        let selectedClass = null;
+
+        // --- ABRIR O LIVRO ---
+        openBookBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede que o clique se propague para outros elementos
+            bookContainer.classList.add('open');
+        });
+
+        // --- SELEÇÃO DE SÉRIE ---
+        gradeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                selectedGrade = button.getAttribute('data-grade');
+                // Esconde o livro e mostra a seleção de turma
+                bookContainer.style.display = 'none';
+                classSelection.classList.remove('hidden');
+            });
+        });
+
+        // --- LÓGICA PRINCIPAL: SELEÇÃO DE TURMA E BUSCA DOS TRABALHOS ---
+        classButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                selectedClass = button.getAttribute('data-class');
+                Swal.fire({
+                    title: 'Buscando trabalhos...',
+                    html: `<p>Aguarde enquanto buscamos as atividades para o <b>${selectedGrade}º Ano - Turma ${selectedClass}</b>.</p>`,
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const AIRTABLE_API_KEY = 'patmsmqDnLsx573SF.18a0ddaddde79f158d1a3f575d388ba24cddd0cc2b9b55edd037d28daaff8f4c';
+                    const AIRTABLE_BASE_ID = 'appU0CeDrefVUKuTI';
+                    const AIRTABLE_TABLE_NAME = 'Trabalhos';
+                    const filterFormula = `AND({Série} = '${selectedGrade}', FIND('${selectedClass}', ARRAYJOIN({Turma})))`;
+                    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}?filterByFormula=${encodeURIComponent(filterFormula)}`;
+                    const config = { headers: { 'Authorization': `Bearer ${AIRTABLE_API_KEY}` } };
+                    const response = await axios.get(url, config);
+                    const trabalhos = response.data.records;
+
+                    Swal.close();
+
+                    classSelection.classList.add('hidden');
+                    trabalhosContainer.classList.remove('hidden');
+                    trabalhosTitulo.innerText = `Trabalhos para o ${selectedGrade}º Ano - Turma ${selectedClass}`;
+                    trabalhosLista.innerHTML = ''; 
+
+                    if (trabalhos.length > 0) {
+                        trabalhos.forEach(record => {
+                            const fields = record.fields;
+                            const linkHtml = fields.Link ? `<a href="${fields.Link}" target="_blank" class="inline-block bg-sky-600 text-white px-4 py-2 rounded hover:bg-sky-700 transition">Acessar link</a>` : '';
+                            const arquivoHtml = fields.Arquivo ? `<a href="${fields.Arquivo[0].url}" target="_blank" class="inline-block bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 transition">Baixar arquivo</a>` : '';
+                            const trabalhoDiv = `
+                                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-700">
+                                    <h3 class="text-xl font-bold text-gray-800">${fields.Título || 'Sem título'}</h3>
+                                    <p class="text-gray-600 mt-2">${fields.Descrição || 'Sem descrição.'}</p>
+                                    <div class="mt-4 space-x-4">${linkHtml} ${arquivoHtml}</div>
+                                </div>`;
+                            trabalhosLista.innerHTML += trabalhoDiv;
+                        });
+                    } else {
+                        trabalhosLista.innerHTML = `<div class="bg-yellow-100 p-6 rounded-lg text-center"><p class="text-yellow-800 font-medium">Nenhum trabalho encontrado para a sua turma no momento.</p></div>`;
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar trabalhos no Airtable:', error);
+                    Swal.fire({ icon: 'error', title: 'Erro de Conexão', text: 'Não foi possível buscar os trabalhos. Tente novamente mais tarde.' });
+                }
+            });
+        });
+
+        // --- BOTÕES DE NAVEGAÇÃO "VOLTAR" ---
+        backToGrade.addEventListener('click', () => {
+            classSelection.classList.add('hidden');
+            bookContainer.style.display = 'block';
+            // Reseta a animação do livro para o estado inicial
+            bookContainer.classList.remove('open');
+        });
+
+        voltarParaSelecao.addEventListener('click', () => {
+            trabalhosContainer.classList.add('hidden');
+            classSelection.classList.remove('hidden');
+            trabalhosLista.innerHTML = '';
+        });
+    </script>
+</body>
+</html>
