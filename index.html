@@ -12,7 +12,7 @@
         
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f5f5ff5;
             overflow-x: hidden;
             perspective: 2000px;
         }
@@ -20,8 +20,9 @@
         .book-container {
             /* Tamanho relativo para funcionar em qualquer tela */
             width: 90vw;
-            max-width: 500px;
-            aspect-ratio: 1 / 1.2; /* Proporção do livro (largura / altura) */
+            max-width: 640px; /* Aumentei a largura máxima */
+            /* --- MUDANÇA PRINCIPAL: Proporção de paisagem --- */
+            aspect-ratio: 1.6 / 1; /* Livro mais largo do que alto */
             
             position: relative;
             transform-style: preserve-3d;
@@ -84,12 +85,9 @@
     <div class="w-full max-w-4xl flex justify-center items-center">
         <div id="bookContainer" class="book-container mx-auto">
             <div id="bookCover" class="book-cover flex flex-col justify-center items-center text-center p-4 rounded-r-lg shadow-2xl" style="background-image: url('capa.png');">
-                <div class="w-full h-full flex flex-col justify-center items-center bg-black bg-opacity-50 rounded-r-lg">
-                    <h1 class="title text-4xl lg:text-5xl font-bold text-white mb-8 text-center px-4" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">Feira do Livro Sertãozinho</h1>
-                    <button id="openBookBtn" class="bg-white text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-gray-200 transition duration-300 shadow-lg text-sm lg:text-base">
-                        Abrir Livro
-                    </button>
-                </div>
+                <button id="openBookBtn" class="bg-white/90 backdrop-blur-sm text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-lg text-sm lg:text-base">
+                    Abrir Livro
+                </button>
             </div>
 
             <div class="book-page rounded-r-lg bg-amber-50">
@@ -149,7 +147,6 @@
         gradeButtons.forEach(button => {
             button.addEventListener('click', () => {
                 selectedGrade = button.getAttribute('data-grade');
-                // Adiciona uma pequena pausa para a animação do clique ser visível
                 setTimeout(() => {
                     bookContainer.style.display = 'none';
                     classSelection.classList.remove('hidden');
@@ -160,13 +157,11 @@
         backToGrade.addEventListener('click', () => {
             classSelection.classList.add('hidden');
             bookContainer.style.display = 'block';
-            // Uma pequena pausa para garantir que o 'display' foi aplicado antes de remover a classe
             setTimeout(() => {
                  bookContainer.classList.remove('open');
             }, 50);
         });
         
-        // O resto do JavaScript (busca no Airtable, etc.) continua igual
         classButtons.forEach(button => {
             button.addEventListener('click', async () => {
                 selectedClass = button.getAttribute('data-class');
@@ -219,4 +214,4 @@
         });
     </script>
 </body>
-            </html>
+</html>
