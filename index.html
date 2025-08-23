@@ -14,26 +14,19 @@
             font-family: 'Roboto', sans-serif;
             background-color: #f5f5ff5;
             overflow-x: hidden;
-            perspective: 2000px;
+            perspective: 2000px; /* Essencial para a animação 3D */
         }
 
         .book-container {
-            /* Tamanho relativo para funcionar em qualquer tela */
             width: 90vw;
-            max-width: 640px; /* Aumentei a largura máxima */
-            /* --- MUDANÇA PRINCIPAL: Proporção de paisagem --- */
-            aspect-ratio: 1.6 / 1; /* Livro mais largo do que alto */
+            max-width: 500px; /* Mantém a largura máxima */
+            /* --- MUDANÇA PRINCIPAL: Proporção mais alta --- */
+            aspect-ratio: 1 / 1.4; /* Livro mais alto do que largo */
+            max-height: 700px;
             
             position: relative;
             transform-style: preserve-3d;
             transition: transform 1.5s ease-in-out;
-        }
-
-        /* Animação de abertura para DESKTOP */
-        @media (min-width: 768px) {
-            .book-container.open {
-                transform: translateX(50%);
-            }
         }
         
         .book-cover, .book-page {
@@ -42,7 +35,7 @@
             height: 100%;
             top: 0;
             left: 0;
-            transform-origin: left center;
+            transform-origin: bottom center;
             transition: transform 1.5s ease-in-out;
             backface-visibility: hidden;
         }
@@ -54,7 +47,7 @@
         }
         
         .book-container.open .book-cover {
-            transform: rotateY(-180deg);
+            transform: rotateX(-180deg);
         }
 
         .book-page {
@@ -84,13 +77,13 @@
 <body class="min-h-screen flex items-center justify-center p-4 bg-stone-200">
     <div class="w-full max-w-4xl flex justify-center items-center">
         <div id="bookContainer" class="book-container mx-auto">
-            <div id="bookCover" class="book-cover flex flex-col justify-center items-center text-center p-4 rounded-r-lg shadow-2xl" style="background-image: url('capa.png');">
-                <button id="openBookBtn" class="bg-white/90 backdrop-blur-sm text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-lg text-sm lg:text-base">
+            <div id="bookCover" class="book-cover flex flex-col justify-center items-center text-center p-4 rounded-lg shadow-2xl" style="background-image: url('capa.png');">
+                <button id="openBookBtn" class="bg-white/90 backdrop-blur-sm text-stone-800 px-6 py-3 rounded-full font-semibold hover:bg-white transition duration-300 shadow-lg text-sm lg:text-base absolute bottom-10">
                     Abrir Livro
                 </button>
             </div>
 
-            <div class="book-page rounded-r-lg bg-amber-50">
+            <div class="book-page rounded-lg bg-amber-50">
                 <h2 class="text-2xl lg:text-3xl font-bold mb-6 lg:mb-8 text-stone-800 text-center">Selecione sua série:</h2>
                 <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
                     <button class="btn-class bg-sky-700 hover:bg-sky-800 text-white py-3 rounded-lg font-medium text-sm lg:text-base" data-grade="6">6º Ano</button>
